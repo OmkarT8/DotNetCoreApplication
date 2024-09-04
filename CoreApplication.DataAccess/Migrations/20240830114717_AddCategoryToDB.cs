@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace CoreApplication.Migrations
+namespace CoreApplication.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class AddCategoryToDB : Migration

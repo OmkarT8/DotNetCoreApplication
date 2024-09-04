@@ -1,4 +1,4 @@
-﻿using CoreApplication.Data;
+﻿using CoreApplication.DataAccess.Data;
 using CoreApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 
