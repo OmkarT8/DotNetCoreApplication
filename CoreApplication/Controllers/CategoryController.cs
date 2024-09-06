@@ -1,4 +1,5 @@
 ﻿using CoreApplication.DataAccess.Data;
+using CoreApplication.DataAccess.Repository.IRepository;
 using CoreApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,14 +7,14 @@ namespace CoreApplication.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly IUnitofWork _unitofWork;
+        public CategoryController(IUnitofWork unitofWork)
         {
-            _db = db;
+            _unitofWork = unitofWork;
         }
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _db.Categories.ToList();
+            List<Category> objCategoryList = _unitofWork.Category.GetAll().ToList();
             return View(objCategoryList);
         }
 
@@ -32,8 +33,8 @@ namespace CoreApplication.Controllers
             //}
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
-                _db.SaveChanges();
+                _unitofWork.Category.Add(obj);
+                _unitofWork.Save();
 				TempData["success"] = "Category Created Successfully.";
                 return RedirectToAction("Index");
             }
@@ -47,7 +48,7 @@ namespace CoreApplication.Controllers
                 return NotFound();
             }
 	
-			Category? dataFromDB = _db.Categories.FirstOrDefault(u => u.ID == id);
+			Category? dataFromDB = _unitofWork.Category.Get(u => u.ID == id);
 			//Category? dataFromDB1 = _db.Categories.Where(u => u.ID == id).FirstOrDefault();
 			//Category? dataFromDB2 = _db.Categories.Find(id); //only works with primary key
             if(dataFromDB == null)
@@ -62,8 +63,8 @@ namespace CoreApplication.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				_db.Categories.Update(obj);
-				_db.SaveChanges();
+                _unitofWork.Category.Update(obj);
+                _unitofWork.Save();
 				TempData["success"] = "Category Updated Successfully.";
 				return RedirectToAction("Index");
 			}
@@ -77,8 +78,8 @@ namespace CoreApplication.Controllers
 				return NotFound();
 			}
 
-			Category? dataFromDB = _db.Categories.FirstOrDefault(u => u.ID == id);
-			if (dataFromDB == null)
+			Category? dataFromDB = _unitofWork.Category.Get(u => u.ID == id);
+            if (dataFromDB == null)
 			{
 				return NotFound();
 			}
@@ -88,13 +89,13 @@ namespace CoreApplication.Controllers
 		[HttpPost, ActionName("Delete")]
 		public IActionResult DeletePOST(int? id)
 		{
-			Category? obj = _db.Categories.FirstOrDefault(u => u.ID == id);
-			if(obj == null)
+			Category? obj = _unitofWork.Category.Get(u => u.ID == id);
+            if (obj == null)
 			{
 				return NotFound();
 			}
-			_db.Categories.Remove(obj);
-			_db.SaveChanges();
+            _unitofWork.Category.Remove(obj);
+            _unitofWork.Save();
 			TempData["success"] = "Category Deleted Successfully.";
 			return RedirectToAction("Index");
 		}
